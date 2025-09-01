@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rubber Duck</title>
     <style>
         body {
@@ -31,6 +31,7 @@
             user-select: none;
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
             animation: float 3s ease-in-out infinite;
+            touch-action: manipulation;
         }
 
         .duck:hover {
@@ -149,7 +150,7 @@
         }
 
         // Duck click handler
-        duck.addEventListener('click', function(event) {
+        function duckAction(event) {
             playQuack();
             createRipple(event);
             // Create quack text
@@ -174,20 +175,27 @@
             setTimeout(() => {
                 quackText.remove();
             }, 800);
-            
             // Add bounce animation
             duck.classList.remove('clicked');
             void duck.offsetWidth; // Trigger reflow
             duck.classList.add('clicked');
-            
             setTimeout(() => {
                 duck.classList.remove('clicked');
             }, 600);
-        });
+        }
 
+        duck.addEventListener('click', duckAction);
+        duck.addEventListener('touchstart', function(event) {
+            event.preventDefault();
+            duckAction(event);
+        }, { passive: false });
         // Prevent context menu on right click
         duck.addEventListener('contextmenu', function(event) {
             event.preventDefault();
+        });
+        // Prevent gesture events (double-tap zoom) on iOS
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
         });
     </script>
 </body>
