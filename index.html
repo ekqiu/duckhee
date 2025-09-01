@@ -79,6 +79,28 @@
             margin-bottom: 20px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
+
+        .quack-text {
+            position: absolute;
+            left: 50%;
+            top: 10px;
+            transform: translateX(-50%);
+            font-size: 32px;
+            color: #fff200;
+            font-weight: bold;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            opacity: 1;
+            pointer-events: none;
+            animation: quack-fade 0.8s ease forwards;
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            transition: transform 0.8s ease;
+        }
+
+        @keyframes quack-fade {
+            0% { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); }
+            70% { opacity: 1; transform: translateX(-50%) scale(1.2) translateY(-20px); }
+            100% { opacity: 0; transform: translateX(-50%) scale(1.1) translateY(-40px); }
+        }
     </style>
 </head>
 <body>
@@ -99,18 +121,12 @@
 
         // Generate quack sound using Web Audio API
             // Play quack.mp3 sound
-            function playQuack() {
-                let quackAudio = document.getElementById('quack-audio');
-                if (!quackAudio) {
-                    quackAudio = document.createElement('audio');
-                    quackAudio.id = 'quack-audio';
-                    quackAudio.src = 'assets/quack.mp3';
-                    quackAudio.preload = 'auto';
-                    document.body.appendChild(quackAudio);
+                function playQuack() {
+                        const quackAudio = new Audio('assets/quack.mp3');
+                        quackAudio.preload = 'auto';
+                        quackAudio.playbackRate = 1.0;
+                        quackAudio.play().catch(() => {});
                 }
-                quackAudio.currentTime = 0;
-                quackAudio.play();
-            }
 
         // Create ripple effect
         function createRipple(event) {
@@ -136,6 +152,28 @@
         duck.addEventListener('click', function(event) {
             playQuack();
             createRipple(event);
+            // Create quack text
+            const quackText = document.createElement('div');
+            quackText.className = 'quack-text';
+            quackText.textContent = 'quack';
+            const container = duck.parentElement;
+            // Random position within duck-container
+            const containerRect = container.getBoundingClientRect();
+            const minX = 0;
+            const maxX = containerRect.width - 80; // 80px width buffer
+            const minY = 0;
+            const maxY = containerRect.height - 60; // 60px height buffer
+            const randX = Math.random() * (maxX - minX) + minX;
+            const randY = Math.random() * (maxY - minY) + minY;
+            // Random rotation between -30 and 30 degrees
+            const randRot = (Math.random() * 60) - 30;
+            quackText.style.left = `${randX}px`;
+            quackText.style.top = `${randY}px`;
+            quackText.style.transform = `rotate(${randRot}deg)`;
+            container.appendChild(quackText);
+            setTimeout(() => {
+                quackText.remove();
+            }, 800);
             
             // Add bounce animation
             duck.classList.remove('clicked');
